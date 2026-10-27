@@ -7,19 +7,19 @@
   <img src="https://img.shields.io/badge/License-MIT-blue" />
 </p>
 
-<h1 align="center">🛍️ Azure E-Commerce Data Lakehouse — Olist Dataset</h1>
+<h1 align="center">Azure E-Commerce Data Lakehouse</h1>
 <p align="center"><b>An end-to-end Azure lakehouse that ingests three heterogeneous data sources — a relational database, a NoSQL database, and flat files — and turns them into a governed, analytics-ready Gold layer using the Medallion architecture.</b></p>
 
 <p align="center">
-  📺 <a href="#-video-walkthrough-phase-by-phase"><b>Watch the full build, phase by phase</b></a> ·
-  📐 <a href="#-architecture">Architecture</a> ·
-  🔗 <a href="#-data-sources">Data Sources</a> ·
-  🚀 <a href="#-how-to-reproduce-it">How to Run</a>
+  <a href="#-video-walkthrough-phase-by-phase"><b>Watch the full build, phase by phase</b></a> ·
+  <a href="#-architecture">Architecture</a> ·
+  <a href="#-data-sources">Data Sources</a> ·
+  <a href="#-how-to-reproduce-it">How to Run</a>
 </p>
 
 ---
 
-## 📖 Overview
+## Overview
 
 Most "data lakehouse" tutorials start with one clean source. This project deliberately doesn't: it ingests the [Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (orders, customers, products, payments, reviews) from **three independent, heterogeneous systems at once** — a relational database, a NoSQL document store, and a set of flat files in a GitHub repo — and reconciles all three into a single star-schema Gold layer, the way a real organization's data actually arrives.
 
@@ -31,22 +31,22 @@ Most "data lakehouse" tutorials start with one clean source. This project delibe
 
 ---
 
-## 🏛️ Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
-    subgraph SRC["📂 Data Sources"]
+    subgraph SRC["Data Sources"]
         direction LR
         SQL[("Relational source\nSQL Database\nhosted on Filess.io")]
         MONGO[("NoSQL source\nMongoDB\nhosted on Filess.io")]
         GH[("Flat-file source\nSelected Olist CSVs\nin a GitHub repo")]
     end
 
-    COLAB["🐍 Google Colab\n(Filess.io connection boilerplate)"]
+    COLAB["Google Colab\n(Filess.io connection boilerplate)"]
     COLAB -->|"loads Olist data"| SQL
     COLAB -->|"loads Olist data"| MONGO
 
-    subgraph ADF["🏭 Azure Data Factory"]
+    subgraph ADF["Azure Data Factory"]
         direction LR
         P1["Parameterized pipeline\nSQL DB → ADLS Gen2"]
         P2["Pipeline\nGitHub (HTTP) → ADLS Gen2"]
@@ -55,11 +55,11 @@ flowchart TD
     SQL --> P1
     GH --> P2
 
-    BRONZE[("🥉 ADLS Gen2 — Bronze\nraw landing zone")]
+    BRONZE[("ADLS Gen2 — Bronze\nraw landing zone")]
     P1 --> BRONZE
     P2 --> BRONZE
 
-    subgraph DBX["🧠 Azure Databricks"]
+    subgraph DBX["Azure Databricks"]
         direction TB
         READ["Read Bronze from ADLS Gen2"]
         MCONN["Live connection to MongoDB\n(enrichment source)"]
@@ -71,10 +71,10 @@ flowchart TD
     MONGO -.->|"queried directly"| MCONN
     BRONZE --> READ
 
-    SILVER[("🥈 ADLS Gen2 — Silver\ncleaned, enriched Parquet")]
+    SILVER[("ADLS Gen2 — Silver\ncleaned, enriched Parquet")]
     SPARK --> SILVER
 
-    subgraph SYN["🏢 Azure Synapse Analytics"]
+    subgraph SYN["Azure Synapse Analytics"]
         direction TB
         LAKEDB["Serverless SQL pool\nlinked to ADLS Gen2"]
         CETAS["CETAS\n(CREATE EXTERNAL TABLE AS SELECT)"]
@@ -82,16 +82,16 @@ flowchart TD
     end
 
     SILVER --> LAKEDB
-    GOLD[("🥇 Gold — external serving tables")]
+    GOLD[("Gold — external serving tables")]
     CETAS --> GOLD
-    GOLD --> BI["📊 Reporting / BI / Ad-hoc SQL"]
+    GOLD --> BI["Reporting / BI / Ad-hoc SQL"]
 ```
 
 | Layer | Where | Purpose |
 |---|---|---|
-| 🥉 **Bronze** | ADLS Gen2 container | Raw data exactly as copied by ADF — no transformation |
-| 🥈 **Silver** | ADLS Gen2 container (Parquet) | Cleaned, joined, and enriched by Databricks/Spark — includes data pulled live from MongoDB |
-| 🥇 **Gold** | Azure Synapse external tables | Business-ready, queryable star schema, built with CETAS directly over Silver Parquet — no physical warehouse load |
+| **Bronze** | ADLS Gen2 container | Raw data exactly as copied by ADF — no transformation |
+| **Silver** | ADLS Gen2 container (Parquet) | Cleaned, joined, and enriched by Databricks/Spark — includes data pulled live from MongoDB |
+| **Gold** | Azure Synapse external tables | Business-ready, queryable star schema, built with CETAS directly over Silver Parquet — no physical warehouse load |
 
 ---
 
@@ -122,11 +122,11 @@ Every phase of this build was recorded — this is the part most portfolio proje
 | **5 · Databricks → Silver** | Connecting Databricks to MongoDB and ADLS Gen2, running Spark transformations, and exporting enriched Parquet to Silver | [▶ Loom](https://www.loom.com/share/d06b3e40c42f443eaee6e613da7d6666) |
 | **6 · Synapse → Gold** | Linking the lake to Synapse and building the Gold layer with CETAS | [▶ Loom](https://www.loom.com/share/9482871969aa402dad8cb73d63abd8f3) |
 
-> 💡 Consider swapping the plain links above for clickable thumbnail images once this is live — a visual "play" card gets far more clicks on a README than a bare link.
+> Consider swapping the plain links above for clickable thumbnail images once this is live — a visual "play" card gets far more clicks on a README than a bare link.
 
 ---
 
-## 🧱 Pipeline Deep Dive
+## Pipeline Deep Dive
 
 <details>
 <summary><b>1️⃣ Ingestion — Google Colab → SQL DB & MongoDB (Filess.io)</b></summary>
@@ -168,7 +168,7 @@ A Synapse workspace is connected directly to the ADLS Gen2 lake (no data duplica
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Category | Tools |
 |---|---|
@@ -182,7 +182,7 @@ A Synapse workspace is connected directly to the ADLS Gen2 lake (no data duplica
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 Azure-Ecommerce-Data-Lakehouse-Medallion-Architecture/
@@ -193,11 +193,11 @@ Azure-Ecommerce-Data-Lakehouse-Medallion-Architecture/
 └── README.md
 ```
 
-> 📝 **Suggestion:** this repo currently holds the two notebooks plus the video index. Adding the actual **ADF pipeline JSON exports**, the **Synapse CETAS scripts**, and an architecture diagram image under a `docs/` folder would make the engineering even easier for a reviewer to verify at a glance — happy to help draft those sections once you export them.
+> **Suggestion:** this repo currently holds the two notebooks plus the video index. Adding the actual **ADF pipeline JSON exports**, the **Synapse CETAS scripts**, and an architecture diagram image under a `docs/` folder would make the engineering even easier for a reviewer to verify at a glance — happy to help draft those sections once you export them.
 
 ---
 
-## 🚀 How to Reproduce It
+## How to Reproduce It
 
 1. **Provision free-tier sources** on [Filess.io](https://filess.io) — one SQL Database instance, one MongoDB instance.
 2. **Run `DataIngestionToSQLDBand_MongoDB.ipynb`** in Google Colab with your Filess.io connection strings to seed both databases with Olist data.
@@ -208,7 +208,7 @@ Azure-Ecommerce-Data-Lakehouse-Medallion-Architecture/
 
 ---
 
-## 🔧 Potential Enhancements
+## Potential Enhancements
 
 - **Automated orchestration end-to-end** — currently Colab ingestion is a manual first step; triggering it (or a scheduled refresh) from ADF via a web activity/Azure Function would make the whole pipeline hands-off.
 - **Incremental loads** — parameterized Copy Activities could be extended with watermark columns for incremental ingestion instead of full reloads each run.
@@ -218,10 +218,10 @@ Azure-Ecommerce-Data-Lakehouse-Medallion-Architecture/
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
-## 👤 Author
+## Author
 
 **Syed Abdul Moiz Hassan** — [GitHub](https://github.com/moizhassan101)
